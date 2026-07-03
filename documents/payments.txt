@@ -1,0 +1,9 @@
+Payments are created after a learner selects a course.
+
+The application creates a Stripe PaymentIntent.
+
+A successful webhook activates the learner's enrollment.
+
+Failed payments do not create active enrollments.
+
+Transactions help keep payment data consistent.

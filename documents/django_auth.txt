@@ -1,0 +1,9 @@
+Django authentication uses the User model.
+
+Login is handled by authenticate() and login().
+
+Logout is handled by logout().
+
+Users can be activated via email confirmation.
+
+Permissions determine what users can access.

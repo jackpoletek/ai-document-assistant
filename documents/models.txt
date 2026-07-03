@@ -1,0 +1,9 @@
+Models define the structure of data in Django.
+
+Each model maps to a database table.
+
+Fields describe the type of stored data.
+
+ForeignKey creates a relationship between models.
+
+Migrations apply model changes to the database.

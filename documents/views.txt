@@ -1,0 +1,9 @@
+Views receive HTTP requests and return HTTP responses.
+
+Function-based views use regular Python functions.
+
+Class-based views provide reusable functionality.
+
+Views can render templates or return JSON responses.
+
+Business logic should stay as simple as possible.

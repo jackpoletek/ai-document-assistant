@@ -1,0 +1,9 @@
+Stripe is used to process online payments.
+
+A PaymentIntent represents a payment in progress.
+
+Webhooks notify the application when a payment succeeds or fails.
+
+Webhook signatures should always be verified.
+
+Payment information should never be trusted from the client.
