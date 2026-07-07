@@ -3,8 +3,11 @@ from pathlib import Path
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
 # Folder where the documents are stored
 DOCUMENTS_DIR = Path("documents")
+
 
 def load_documents():
     """Loads all .txt files from the documents directory and prints their names and contents."""
@@ -35,10 +38,30 @@ def split_documents(documents):
     return splitter.split_documents(documents)
 
 
+def create_embeddings():
+    """Creates a local embedding model using HuggingFaceEmbeddings."""
+
+    return HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+
+
 def main():
     documents = load_documents()
 
     chunks = split_documents(documents)
+
+    embeddings = create_embeddings(chunks)
+
+    vectors = embeddings.embed_documents(
+        [chunk.page_content for chunk in chunks]
+    )
+
+    print(f"Created {len(vectors)} embeddings.")
+    print()
+
+    print("First embedding (first 10 numbers):")
+    print(vectors[0][:10])
 
     print(f"Loaded documents: {len(documents)}")
     print(f"Created chunks: {len(chunks)}")
