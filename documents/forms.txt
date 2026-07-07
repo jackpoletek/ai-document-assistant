@@ -1,0 +1,9 @@
+Django forms validate user input.
+
+ModelForm generates forms from Django models.
+
+Forms protect against invalid data.
+
+clean() allows custom validation.
+
+is_valid() returns True when validation succeeds.

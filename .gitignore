@@ -13,3 +13,6 @@ __pycache__/
 
 # macOS
 .DS_Store
+
+# FAISS index directory
+faiss_index/
