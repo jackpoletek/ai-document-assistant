@@ -4,6 +4,7 @@ from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
 
 # Folder where the documents are stored
 DOCUMENTS_DIR = Path("documents")
@@ -46,34 +47,61 @@ def create_embeddings():
     )
 
 
+def create_vectorstore(chunks, embeddings):
+    """Creates a FAISS vector store from the embeddings and chunks."""
+
+    vector_store = FAISS.from_documents(
+        documents=chunks,
+        embedding=embeddings
+    )
+
+    return vector_store
+
+
+def search_documents(vector_store, question):
+    """Searches for document chunks similar to the question."""
+
+    results = vector_store.similarity_search(
+        question,
+        k=3
+    )
+
+    return results
+
+
 def main():
     documents = load_documents()
 
     chunks = split_documents(documents)
 
-    embeddings = create_embeddings(chunks)
+    embeddings = create_embeddings()
 
-    vectors = embeddings.embed_documents(
-        [chunk.page_content for chunk in chunks]
+    vector_store = create_vectorstore(
+        chunks,
+        embeddings
     )
 
-    print(f"Created {len(vectors)} embeddings.")
-    print()
+    question = input("Enter your question: ")
 
-    print("First embedding (first 10 numbers):")
-    print(vectors[0][:10])
+    results = search_documents(
+        vector_store,
+        question
+    )
+
+    print("\nMost relevant search results:")
+
+    for i, result in enumerate(results, start=1):
+        print("=" * 60)
+        print(f"Result {i}")
+        print(f"Source: {result.metadata['source']}")
+        print("-" * 60)
+        print(result.page_content)
+        print()
 
     print(f"Loaded documents: {len(documents)}")
     print(f"Created chunks: {len(chunks)}")
+    print(f"Vector store contains: {vector_store.index.ntotal} vectors.")
     print()
-
-    for i, chunk in enumerate(chunks, start=1):
-        print("=" * 60)
-        print(f"Chunk {i}")
-        print(f"Source: {chunk.metadata['source']}")
-        print("-" * 60)
-        print(chunk.page_content)
-        print()
 
 
 if __name__ == "__main__":
