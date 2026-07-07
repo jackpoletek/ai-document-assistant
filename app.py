@@ -5,6 +5,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_ollama import ChatOllama
 
 # Folder where the documents are stored
 DOCUMENTS_DIR = Path("documents")
@@ -69,6 +70,40 @@ def search_documents(vector_store, question):
     return results
 
 
+def create_llm():
+    """Creates a local LLM using ChatOllama."""
+
+    return ChatOllama(
+        model="llama3.2:3b",
+        temperature=0,
+    )
+
+
+def answer_question(llm, question, documents):
+    """Generates an answer using the retrieved document chunks."""
+
+    context = "\n\n".join(
+        document.page_content for document in documents
+    )
+
+    prompt = f"""
+    You are a helpful assistant.
+    Answer the following question based on the context below using ONLY the information provided.
+    If the answer is not contained within the context, respond with "I don't know."
+
+    Context: {context}
+
+    Question: {question}
+
+    Answer:
+
+    """
+
+    response = llm.invoke(prompt)
+
+    return response.content
+
+
 def main():
     documents = load_documents()
 
@@ -81,6 +116,11 @@ def main():
         embeddings
     )
 
+    print(f"Loaded documents: {len(documents)}")
+    print(f"Created chunks: {len(chunks)}")
+    print(f"Vector store contains: {vector_store.index.ntotal} vectors.")
+    print()
+
     question = input("Enter your question: ")
 
     results = search_documents(
@@ -88,20 +128,17 @@ def main():
         question
     )
 
-    print("\nMost relevant search results:")
+    llm = create_llm()
 
-    for i, result in enumerate(results, start=1):
-        print("=" * 60)
-        print(f"Result {i}")
-        print(f"Source: {result.metadata['source']}")
-        print("-" * 60)
-        print(result.page_content)
-        print()
+    answer = answer_question(
+        llm,
+        question,
+        results
+    )
 
-    print(f"Loaded documents: {len(documents)}")
-    print(f"Created chunks: {len(chunks)}")
-    print(f"Vector store contains: {vector_store.index.ntotal} vectors.")
-    print()
+    print("\nAnswer:")
+    print("=" * 60)
+    print(answer)
 
 
 if __name__ == "__main__":
